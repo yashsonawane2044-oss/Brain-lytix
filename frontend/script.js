@@ -1,14 +1,16 @@
-"use strict";
-
-/* =========================================================
+/* =========================================
    BRAINLYTIX
-   Memory + Attention
-   50 levels each
-========================================================= */
+   MAIN JAVASCRIPT
+========================================= */
 
-const API = "http://127.0.0.1:5000";
+const API_URL = "http://127.0.0.1:5000";
 
-let authMode = "login";
+const TOTAL_LEVELS = 50;
+
+
+/* =========================================
+   STATE
+========================================= */
 
 let currentUser = null;
 
@@ -18,166 +20,260 @@ let currentLevel = 1;
 
 let currentScore = 0;
 
-let memoryProgress = [];
+let memoryAnswer = "";
 
-let attentionProgress = [];
-
-let currentChallenge = null;
-
-let challengeTimer = null;
+let memoryTimer = null;
 
 
-/* =========================================================
-   DOM
-========================================================= */
+/* =========================================
+   ELEMENTS
+========================================= */
 
-const $ = (id) => document.getElementById(id);
+const authScreen =
+    document.getElementById("authScreen");
+
+const mainScreen =
+    document.getElementById("mainScreen");
+
+const loginForm =
+    document.getElementById("loginForm");
+
+const registerForm =
+    document.getElementById("registerForm");
+
+const switchAuth =
+    document.getElementById("switchAuth");
+
+const switchText =
+    document.getElementById("switchText");
+
+const authTitle =
+    document.getElementById("authTitle");
+
+const authSubtitle =
+    document.getElementById("authSubtitle");
+
+const authMessage =
+    document.getElementById("authMessage");
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+const usernameDisplay =
+    document.getElementById("usernameDisplay");
+
+const avatarLetter =
+    document.getElementById("avatarLetter");
+
+const memoryButton =
+    document.getElementById("memoryButton");
+
+const attentionButton =
+    document.getElementById("attentionButton");
+
+const levelScreen =
+    document.getElementById("levelScreen");
+
+const gameScreen =
+    document.getElementById("gameScreen");
+
+const levelsGrid =
+    document.getElementById("levelsGrid");
+
+const levelTitle =
+    document.getElementById("levelTitle");
+
+const levelTypeLabel =
+    document.getElementById("levelTypeLabel");
+
+const backToDashboard =
+    document.getElementById("backToDashboard");
+
+const backToLevels =
+    document.getElementById("backToLevels");
+
+const currentLevelDisplay =
+    document.getElementById("currentLevel");
+
+const currentScoreDisplay =
+    document.getElementById("currentScore");
+
+const gameType =
+    document.getElementById("gameType");
+
+const memoryGame =
+    document.getElementById("memoryGame");
+
+const attentionGame =
+    document.getElementById("attentionGame");
+
+const memorySequence =
+    document.getElementById("memorySequence");
+
+const memoryInputArea =
+    document.getElementById("memoryInputArea");
+
+const memoryAnswerInput =
+    document.getElementById("memoryAnswer");
+
+const memorySubmit =
+    document.getElementById("memorySubmit");
+
+const attentionGrid =
+    document.getElementById("attentionGrid");
+
+const gameResult =
+    document.getElementById("gameResult");
+
+const resultScore =
+    document.getElementById("resultScore");
+
+const resultMessage =
+    document.getElementById("resultMessage");
+
+const nextLevelButton =
+    document.getElementById("nextLevelButton");
+
+const memoryStat =
+    document.getElementById("memoryStat");
+
+const attentionStat =
+    document.getElementById("attentionStat");
+
+const completedStat =
+    document.getElementById("completedStat");
 
 
-/* =========================================================
-   SCREEN CONTROL
-========================================================= */
+/* =========================================
+   AUTH MESSAGE
+========================================= */
 
-function showScreen(id) {
+function showAuthMessage(message, type = "error") {
 
-    document.querySelectorAll(".screen").forEach((screen) => {
-        screen.classList.add("hidden");
-    });
+    authMessage.textContent = message;
 
-    const target = $(id);
+    if (type === "success") {
 
-    if (target) {
-        target.classList.remove("hidden");
+        authMessage.style.color = "#16a34a";
+
+    } else {
+
+        authMessage.style.color = "#dc2626";
     }
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 }
 
 
-/* =========================================================
-   AUTH TABS
-========================================================= */
+/* =========================================
+   SWITCH LOGIN / REGISTER
+========================================= */
 
-function setAuthMode(mode) {
-
-    authMode = mode;
-
-    $("loginTab").classList.toggle(
-        "active",
-        mode === "login"
-    );
-
-    $("registerTab").classList.toggle(
-        "active",
-        mode === "register"
-    );
-
-    $("authButton").textContent =
-        mode === "login"
-            ? "Login"
-            : "Create Account";
-
-    $("authMessage").textContent = "";
-
-    $("password").value = "";
-}
-
-
-$("loginTab").addEventListener(
+switchAuth.addEventListener(
     "click",
-    () => setAuthMode("login")
+    () => {
+
+        const registerVisible =
+            !registerForm.classList.contains("hidden");
+
+        if (registerVisible) {
+
+            registerForm.classList.add("hidden");
+
+            loginForm.classList.remove("hidden");
+
+            authTitle.textContent =
+                "Welcome back";
+
+            authSubtitle.textContent =
+                "Login to continue your brain training journey.";
+
+            switchText.textContent =
+                "Don't have an account?";
+
+            switchAuth.textContent =
+                "Register";
+
+        } else {
+
+            loginForm.classList.add("hidden");
+
+            registerForm.classList.remove("hidden");
+
+            authTitle.textContent =
+                "Create your account";
+
+            authSubtitle.textContent =
+                "Start your personalized brain training journey.";
+
+            switchText.textContent =
+                "Already have an account?";
+
+            switchAuth.textContent =
+                "Login";
+        }
+
+        authMessage.textContent = "";
+    }
 );
 
-$("registerTab").addEventListener(
-    "click",
-    () => setAuthMode("register")
-);
 
+/* =========================================
+   LOGIN
+========================================= */
 
-/* =========================================================
-   AUTH
-========================================================= */
-
-$("authForm").addEventListener(
+loginForm.addEventListener(
     "submit",
     async (event) => {
 
         event.preventDefault();
 
         const username =
-            $("username").value.trim();
+            document.getElementById(
+                "loginUsername"
+            ).value.trim();
 
         const password =
-            $("password").value;
+            document.getElementById(
+                "loginPassword"
+            ).value;
 
-        if (username.length < 3) {
+        if (!username || !password) {
 
             showAuthMessage(
-                "Username must contain at least 3 characters."
+                "Please enter username and password."
             );
 
             return;
         }
-
-        if (password.length < 4) {
-
-            showAuthMessage(
-                "Password must contain at least 4 characters."
-            );
-
-            return;
-        }
-
-        $("authButton").disabled = true;
-
-        $("authButton").textContent =
-            authMode === "login"
-                ? "Logging in..."
-                : "Creating...";
 
         try {
 
-            const response = await fetch(
-                `${API}/api/${authMode}`,
-                {
-                    method: "POST",
+            const response =
+                await fetch(
+                    `${API_URL}/api/login`,
+                    {
+                        method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                    body: JSON.stringify({
-                        username,
-                        password
-                    })
-                }
-            );
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    }
+                );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok || !data.success) {
 
                 showAuthMessage(
                     data.message ||
-                    "Something went wrong."
+                    "Invalid username or password."
                 );
-
-                return;
-            }
-
-            if (authMode === "register") {
-
-                showToast(
-                    "Account created. You can now login."
-                );
-
-                setAuthMode("login");
-
-                $("password").value = "";
 
                 return;
             }
@@ -192,1090 +288,884 @@ $("authForm").addEventListener(
                 JSON.stringify(currentUser)
             );
 
-            await loadProgress();
+            loginForm.reset();
 
-            showHome();
+            showMainScreen();
 
         } catch (error) {
 
             console.error(error);
 
             showAuthMessage(
-                "Backend is not connected. Start app.py first."
+                "Backend is not connected. Start Flask on port 5000."
             );
-
-        } finally {
-
-            $("authButton").disabled = false;
-
-            $("authButton").textContent =
-                authMode === "login"
-                    ? "Login"
-                    : "Create Account";
         }
     }
 );
 
 
-function showAuthMessage(message) {
+/* =========================================
+   REGISTER
+========================================= */
 
-    $("authMessage").textContent = message;
+registerForm.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+        const username =
+            document.getElementById(
+                "registerUsername"
+            ).value.trim();
+
+        const password =
+            document.getElementById(
+                "registerPassword"
+            ).value;
+
+        if (username.length < 3) {
+
+            showAuthMessage(
+                "Username must contain at least 3 characters."
+            );
+
+            return;
+        }
+
+        if (password.length < 6) {
+
+            showAuthMessage(
+                "Password must contain at least 6 characters."
+            );
+
+            return;
+        }
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/api/register`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok || !data.success) {
+
+                showAuthMessage(
+                    data.message ||
+                    "Registration failed."
+                );
+
+                return;
+            }
+
+            showAuthMessage(
+                "Account created successfully. You can now login.",
+                "success"
+            );
+
+            registerForm.reset();
+
+            setTimeout(() => {
+
+                switchAuth.click();
+
+            }, 1000);
+
+        } catch (error) {
+
+            console.error(error);
+
+            showAuthMessage(
+                "Backend is not connected. Start Flask on port 5000."
+            );
+        }
+    }
+);
+
+
+/* =========================================
+   SHOW MAIN SCREEN
+========================================= */
+
+async function showMainScreen() {
+
+    authScreen.classList.add("hidden");
+
+    mainScreen.classList.remove("hidden");
+
+    usernameDisplay.textContent =
+        currentUser.username;
+
+    avatarLetter.textContent =
+        currentUser.username
+            .charAt(0)
+            .toUpperCase();
+
+    await loadDashboardProgress();
 }
 
 
-/* =========================================================
-   LOGIN SESSION
-========================================================= */
+/* =========================================
+   LOGOUT
+========================================= */
 
-function restoreSession() {
+logoutButton.addEventListener(
+    "click",
+    () => {
 
-    const saved =
-        localStorage.getItem("brainlytixUser");
-
-    if (!saved) {
-
-        showScreen("authScreen");
-
-        return;
-    }
-
-    try {
-
-        currentUser = JSON.parse(saved);
-
-        if (!currentUser.id) {
-            throw new Error("Invalid session");
-        }
-
-        loadProgress()
-            .then(showHome)
-            .catch(() => {
-
-                localStorage.removeItem(
-                    "brainlytixUser"
-                );
-
-                currentUser = null;
-
-                showScreen("authScreen");
-            });
-
-    } catch {
+        currentUser = null;
 
         localStorage.removeItem(
             "brainlytixUser"
         );
 
-        showScreen("authScreen");
+        mainScreen.classList.add("hidden");
+
+        authScreen.classList.remove("hidden");
+
+        levelScreen.classList.add("hidden");
+
+        gameScreen.classList.add("hidden");
+
+        loginForm.classList.remove("hidden");
+
+        registerForm.classList.add("hidden");
+
+        authTitle.textContent =
+            "Welcome back";
+
+        authSubtitle.textContent =
+            "Login to continue your brain training journey.";
+
+        switchText.textContent =
+            "Don't have an account?";
+
+        switchAuth.textContent =
+            "Register";
+
+        authMessage.textContent = "";
     }
-}
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-$("logoutButton").addEventListener(
-    "click",
-    logout
 );
 
 
-function logout() {
+/* =========================================
+   MEMORY BUTTON
+========================================= */
 
-    currentUser = null;
+memoryButton.addEventListener(
+    "click",
+    () => {
 
-    memoryProgress = [];
-
-    attentionProgress = [];
-
-    localStorage.removeItem(
-        "brainlytixUser"
-    );
-
-    $("username").value = "";
-
-    $("password").value = "";
-
-    setAuthMode("login");
-
-    showScreen("authScreen");
-
-    showToast("You have been logged out.");
-}
-
-
-/* =========================================================
-   HOME
-========================================================= */
-
-function showHome() {
-
-    if (!currentUser) {
-
-        showScreen("authScreen");
-
-        return;
+        openLevels("memory");
     }
-
-    $("welcomeUser").textContent =
-        currentUser.username;
-
-    updateHomeStats();
-
-    showScreen("menuScreen");
-}
-
-
-$("memoryCard").addEventListener(
-    "click",
-    () => openLevels("memory")
-);
-
-$("attentionCard").addEventListener(
-    "click",
-    () => openLevels("attention")
 );
 
 
-/* =========================================================
-   PROGRESS
-========================================================= */
+/* =========================================
+   ATTENTION BUTTON
+========================================= */
 
-async function loadProgress() {
+attentionButton.addEventListener(
+    "click",
+    () => {
 
-    if (!currentUser) return;
-
-    const [memoryResponse, attentionResponse] =
-        await Promise.all([
-
-            fetch(
-                `${API}/api/progress/${currentUser.id}/memory`
-            ),
-
-            fetch(
-                `${API}/api/progress/${currentUser.id}/attention`
-            )
-
-        ]);
-
-    if (!memoryResponse.ok ||
-        !attentionResponse.ok) {
-
-        throw new Error(
-            "Could not load progress."
-        );
+        openLevels("attention");
     }
-
-    memoryProgress =
-        await memoryResponse.json();
-
-    attentionProgress =
-        await attentionResponse.json();
-
-    updateHomeStats();
-}
+);
 
 
-function updateHomeStats() {
+/* =========================================
+   OPEN LEVELS
+========================================= */
 
-    const memoryCompleted =
-        getCompletedLevels("memory").length;
-
-    const attentionCompleted =
-        getCompletedLevels("attention").length;
-
-    $("memoryProgress").textContent =
-        `${memoryCompleted === 0 ? 1 : memoryCompleted + 1 > 50 ? 50 : memoryCompleted + 1} / 50`;
-
-    $("attentionProgress").textContent =
-        `${attentionCompleted === 0 ? 1 : attentionCompleted + 1 > 50 ? 50 : attentionCompleted + 1} / 50`;
-
-    $("totalCompleted").textContent =
-        memoryCompleted +
-        attentionCompleted;
-}
-
-
-function getProgress(test) {
-
-    return test === "memory"
-        ? memoryProgress
-        : attentionProgress;
-}
-
-
-function getCompletedLevels(test) {
-
-    return getProgress(test)
-        .map(item => Number(item.level))
-        .filter(level => level >= 1 && level <= 50);
-}
-
-
-function getHighestCompleted(test) {
-
-    const levels =
-        getCompletedLevels(test);
-
-    return levels.length
-        ? Math.max(...levels)
-        : 0;
-}
-
-
-function getUnlockedLevel(test) {
-
-    return Math.min(
-        getHighestCompleted(test) + 1,
-        50
-    );
-}
-
-
-function isCompleted(test, level) {
-
-    return getCompletedLevels(test)
-        .includes(level);
-}
-
-
-/* =========================================================
-   LEVELS
-========================================================= */
-
-function openLevels(test) {
-
-    if (!currentUser) {
-
-        showScreen("authScreen");
-
-        return;
-    }
+async function openLevels(test) {
 
     currentTest = test;
 
-    const isMemory =
-        test === "memory";
+    levelScreen.classList.remove("hidden");
 
-    $("levelTestIcon").textContent =
-        isMemory ? "🧠" : "🎯";
+    gameScreen.classList.add("hidden");
 
-    $("levelTitle").textContent =
-        isMemory
-            ? "Memory Levels"
-            : "Attention Levels";
+    document.querySelector(".tests-section")
+        .classList.add("hidden");
 
-    $("levelsHeading").textContent =
-        isMemory
-            ? "Build your memory"
-            : "Sharpen your attention";
+    document.querySelector(".stats-grid")
+        .classList.add("hidden");
 
-    $("levelsDescription").textContent =
-        isMemory
-            ? "Remember more as the challenges become harder."
-            : "Stay focused as patterns become more challenging.";
+    document.querySelector(".hero")
+        .classList.add("hidden");
 
-    renderLevels();
+    if (test === "memory") {
 
-    showScreen("levelsScreen");
+        levelTypeLabel.textContent =
+            "🧠 MEMORY";
+
+        levelTitle.textContent =
+            "Memory Levels";
+
+    } else {
+
+        levelTypeLabel.textContent =
+            "🎯 ATTENTION";
+
+        levelTitle.textContent =
+            "Attention Levels";
+    }
+
+    await renderLevels();
 }
 
 
-$("levelsBackButton").addEventListener(
+/* =========================================
+   BACK TO DASHBOARD
+========================================= */
+
+backToDashboard.addEventListener(
     "click",
-    showHome
+    () => {
+
+        levelScreen.classList.add("hidden");
+
+        document.querySelector(".tests-section")
+            .classList.remove("hidden");
+
+        document.querySelector(".stats-grid")
+            .classList.remove("hidden");
+
+        document.querySelector(".hero")
+            .classList.remove("hidden");
+    }
 );
 
 
-function renderLevels() {
+/* =========================================
+   BACK TO LEVELS
+========================================= */
 
-    const grid = $("levelsGrid");
+backToLevels.addEventListener(
+    "click",
+    () => {
 
-    grid.innerHTML = "";
+        stopMemoryTimer();
+
+        gameScreen.classList.add("hidden");
+
+        levelScreen.classList.remove("hidden");
+
+        renderLevels();
+    }
+);
+
+
+/* =========================================
+   LOAD PROGRESS
+========================================= */
+
+async function getProgress(test) {
+
+    if (!currentUser) {
+        return [];
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/api/progress/${currentUser.id}/${test}`
+            );
+
+        if (!response.ok) {
+            return [];
+        }
+
+        return await response.json();
+
+    } catch (error) {
+
+        console.error(
+            "Progress error:",
+            error
+        );
+
+        return [];
+    }
+}
+
+
+/* =========================================
+   DASHBOARD PROGRESS
+========================================= */
+
+async function loadDashboardProgress() {
+
+    const memoryProgress =
+        await getProgress("memory");
+
+    const attentionProgress =
+        await getProgress("attention");
+
+    const memoryMax =
+        getHighestLevel(memoryProgress);
+
+    const attentionMax =
+        getHighestLevel(attentionProgress);
 
     const completed =
-        getCompletedLevels(currentTest);
+        memoryProgress.length +
+        attentionProgress.length;
 
-    const unlocked =
-        getUnlockedLevel(currentTest);
+    memoryStat.textContent =
+        `${memoryMax} / ${TOTAL_LEVELS}`;
 
-    $("completedCount").textContent =
-        completed.length;
+    attentionStat.textContent =
+        `${attentionMax} / ${TOTAL_LEVELS}`;
 
-    for (let level = 1; level <= 50; level++) {
+    completedStat.textContent =
+        completed;
+}
+
+
+/* =========================================
+   HIGHEST LEVEL
+========================================= */
+
+function getHighestLevel(progress) {
+
+    if (!Array.isArray(progress) ||
+        progress.length === 0) {
+
+        return 0;
+    }
+
+    return Math.max(
+        ...progress.map(
+            item => Number(item.level) || 0
+        )
+    );
+}
+
+
+/* =========================================
+   RENDER LEVELS
+========================================= */
+
+async function renderLevels() {
+
+    levelsGrid.innerHTML = "";
+
+    const progress =
+        await getProgress(currentTest);
+
+    const completedLevels =
+        new Map();
+
+    progress.forEach(item => {
+
+        completedLevels.set(
+            Number(item.level),
+            Number(item.score)
+        );
+    });
+
+
+    /*
+       LEVEL 1 IS ALWAYS UNLOCKED.
+       NEXT LEVEL UNLOCKS AFTER
+       PREVIOUS LEVEL IS COMPLETED.
+    */
+
+    const highestCompleted =
+        getHighestLevel(progress);
+
+
+    for (
+        let level = 1;
+        level <= TOTAL_LEVELS;
+        level++
+    ) {
+
+        const isCompleted =
+            completedLevels.has(level);
+
+        const isUnlocked =
+            level === 1 ||
+            level <= highestCompleted + 1;
 
         const button =
             document.createElement("button");
 
         button.type = "button";
 
-        button.className = "level-btn";
+        button.className =
+            "level-button";
 
-        const completedLevel =
-            completed.includes(level);
-
-        const locked =
-            level > unlocked;
-
-        const difficulty =
-            getDifficulty(level);
-
-        if (completedLevel) {
-
-            button.classList.add("completed");
-
-        } else if (level === unlocked) {
-
-            button.classList.add("current");
-
-        }
-
-        if (locked) {
+        if (!isUnlocked) {
 
             button.classList.add("locked");
 
-            button.disabled = true;
+        } else {
+
+            button.classList.add("unlocked");
         }
 
-        button.innerHTML = `
-            <span class="level-number">
-                ${level}
-            </span>
+        if (isCompleted) {
 
-            <span class="level-name">
-                ${difficulty}
-            </span>
-
-            <span class="level-status">
-                ${completedLevel ? "✓" : locked ? "🔒" : "→"}
-            </span>
-        `;
-
-        if (!locked) {
-
-            button.addEventListener(
-                "click",
-                () => startLevel(level)
-            );
+            button.classList.add("completed");
         }
 
-        grid.appendChild(button);
-    }
-}
 
+        const number =
+            document.createElement("div");
 
-function getDifficulty(level) {
+        number.className =
+            "level-number";
 
-    if (level <= 5) {
-        return "Easy";
-    }
+        number.textContent =
+            isUnlocked
+                ? level
+                : "🔒";
 
-    if (level <= 20) {
-        return "Intermediate";
-    }
 
-    if (level <= 35) {
-        return "Hard";
-    }
+        const status =
+            document.createElement("div");
 
-    if (level <= 45) {
-        return "Very Hard";
-    }
+        status.className =
+            "level-status";
 
-    return "Expert";
-}
 
+        if (isCompleted) {
 
-/* =========================================================
-   START LEVEL
-========================================================= */
+            status.textContent =
+                `✓ ${completedLevels.get(level)} pts`;
 
-function startLevel(level) {
+        } else if (isUnlocked) {
 
-    clearChallengeTimer();
+            status.textContent =
+                "Start Level";
 
-    currentLevel = level;
+        } else {
 
-    currentScore = 0;
+            status.textContent =
+                "Locked";
+        }
 
-    $("gameScore").textContent =
-        "0";
 
-    $("gameTestName").textContent =
-        currentTest === "memory"
-            ? "Memory Test"
-            : "Attention Test";
+        button.appendChild(number);
 
-    $("gameIcon").textContent =
-        currentTest === "memory"
-            ? "🧠"
-            : "🎯";
+        button.appendChild(status);
 
-    $("gameLevelName").textContent =
-        `Level ${level}`;
 
-    $("progressText").textContent =
-        `${level} / 50`;
-
-    $("progressFill").style.width =
-        `${(level / 50) * 100}%`;
-
-    $("gameMessage").textContent = "";
-
-    $("gameMessage").className =
-        "game-message";
-
-    $("nextLevelButton").classList.add(
-        "hidden"
-    );
-
-    showScreen("gameScreen");
-
-    if (currentTest === "memory") {
-
-        startMemoryLevel(level);
-
-    } else {
-
-        startAttentionLevel(level);
-    }
-}
-
-
-/* =========================================================
-   MEMORY GAME
-========================================================= */
-
-function startMemoryLevel(level) {
-
-    clearChallengeTimer();
-
-    const challenge =
-        createMemoryChallenge(level);
-
-    currentChallenge = challenge;
-
-    $("gameInstruction").textContent =
-        "Remember everything you see.";
-
-    $("challengeArea").innerHTML = `
-        <div class="memory-items">
-            ${challenge.items.map(
-                (item, index) => `
-                    <div
-                        class="memory-item"
-                        style="animation-delay:${index * 0.05}s">
-                        ${escapeHTML(item)}
-                    </div>
-                `
-            ).join("")}
-        </div>
-    `;
-
-    $("answerArea").innerHTML = "";
-
-    /*
-       The game waits 10 seconds.
-       There is no countdown shown to the player.
-    */
-
-    challengeTimer = setTimeout(() => {
-
-        $("challengeArea").innerHTML = `
-            <div class="ready-message">
-                <h2>Now recall what you saw.</h2>
-                <p>Enter the items in their original order.</p>
-            </div>
-        `;
-
-        $("answerArea").innerHTML = `
-            <input
-                id="memoryAnswer"
-                class="answer-input"
-                type="text"
-                placeholder="Example: A 7 HOUSE 3"
-                autocomplete="off"
-            >
-
-            <button
-                id="memorySubmit"
-                class="primary-btn submit-answer"
-                type="button">
-                Check Answer
-            </button>
-        `;
-
-        $("memorySubmit").addEventListener(
-            "click",
-            checkMemoryAnswer
-        );
-
-        $("memoryAnswer").addEventListener(
-            "keydown",
-            event => {
-
-                if (event.key === "Enter") {
-                    checkMemoryAnswer();
-                }
-
-            }
-        );
-
-        $("memoryAnswer").focus();
-
-    }, 10000);
-}
-
-
-/* =========================================================
-   MEMORY CHALLENGE GENERATOR
-========================================================= */
-
-function createMemoryChallenge(level) {
-
-    /*
-       Difficulty pattern:
-
-       1 - 5
-       1 item
-
-       6 - 14
-       3 items
-
-       15 - 20
-       4 items
-
-       21 - 25
-       5 items
-
-       26 - 40
-       5-6 items
-
-       41 - 50
-       10 items
-    */
-
-    let count;
-
-    if (level <= 5) {
-
-        count = 1;
-
-    } else if (level <= 14) {
-
-        count = 3;
-
-    } else if (level <= 20) {
-
-        count = 4;
-
-    } else if (level <= 25) {
-
-        count = 5;
-
-    } else if (level <= 40) {
-
-        count = level % 2 === 0
-            ? 6
-            : 5;
-
-    } else {
-
-        count = 10;
-    }
-
-    const items = [];
-
-    for (let i = 0; i < count; i++) {
-
-        items.push(
-            generateMemoryItem(
-                level,
-                i
-            )
-        );
-    }
-
-    /*
-       Replay variation:
-       Randomized item generation means
-       replaying a completed level gives
-       a different challenge.
-    */
-
-    return {
-        items,
-        level
-    };
-}
-
-
-function generateMemoryItem(level, index) {
-
-    const easyLetters =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ";
-
-    const symbols = [
-        "@",
-        "#",
-        "%",
-        "&",
-        "*",
-        "+",
-        "=",
-        "$",
-        "?",
-        "!",
-        "~"
-    ];
-
-    const words = [
-        "APPLE",
-        "RIVER",
-        "HOUSE",
-        "TRAIN",
-        "LIGHT",
-        "WINDOW",
-        "GARDEN",
-        "BRIDGE",
-        "PLANET",
-        "MARKET",
-        "FOREST",
-        "SCHOOL"
-    ];
-
-    const arithmeticEasy = [
-        "2+3",
-        "5-2",
-        "3+4",
-        "8-3",
-        "2×4"
-    ];
-
-    const arithmeticMedium = [
-        "12+5",
-        "18-7",
-        "6×3",
-        "20÷4",
-        "15+8",
-        "24-9"
-    ];
-
-    const arithmeticHard = [
-        "14+27",
-        "35-18",
-        "7×8",
-        "48÷6",
-        "23+19",
-        "64-27",
-        "9×7",
-        "81÷9"
-    ];
-
-    const arithmeticExpert = [
-        "125+38",
-        "240-87",
-        "12×8",
-        "144÷12",
-        "37+68-12",
-        "15×7-9",
-        "180÷9+14",
-        "250-75+18"
-    ];
-
-    /*
-       Level 1-5:
-       Letters only.
-    */
-
-    if (level <= 5) {
-
-        return randomChar(easyLetters);
-    }
-
-    /*
-       Level 6-14:
-       Letters + small arithmetic.
-    */
-
-    if (level <= 14) {
-
-        return Math.random() < 0.45
-            ? randomItem(arithmeticEasy)
-            : randomChar(easyLetters);
-    }
-
-    /*
-       Level 15-20:
-       Four items, words + arithmetic.
-    */
-
-    if (level <= 20) {
-
-        return Math.random() < 0.55
-            ? randomItem(words)
-            : randomItem(arithmeticMedium);
-    }
-
-    /*
-       Level 21-25:
-       Five items.
-    */
-
-    if (level <= 25) {
-
-        const pool = [
-            ...words,
-            ...arithmeticMedium,
-            ...symbols
-        ];
-
-        return randomItem(pool);
-    }
-
-    /*
-       Level 26-40:
-       More complex.
-    */
-
-    if (level <= 40) {
-
-        const pool = [
-            ...words,
-            ...symbols,
-            ...arithmeticHard
-        ];
-
-        return randomItem(pool);
-    }
-
-    /*
-       Level 41-50:
-       Expert arithmetic + words + symbols.
-    */
-
-    const pool = [
-        ...words,
-        ...symbols,
-        ...arithmeticHard,
-        ...arithmeticExpert
-    ];
-
-    return randomItem(pool);
-}
-
-
-/* =========================================================
-   MEMORY ANSWER
-========================================================= */
-
-function checkMemoryAnswer() {
-
-    const input =
-        $("memoryAnswer");
-
-    if (!input) return;
-
-    const userAnswer =
-        normalizeAnswer(input.value);
-
-    const correctAnswer =
-        currentChallenge.items
-            .map(item => normalizeAnswer(item))
-            .join(" ");
-
-    if (!userAnswer) {
-
-        showGameMessage(
-            "Please enter your answer.",
-            "error"
-        );
-
-        return;
-    }
-
-    if (userAnswer === correctAnswer) {
-
-        finishLevel(
-            100 + currentLevel * 5
-        );
-
-    } else {
-
-        showGameMessage(
-            `Not quite. Correct sequence: ${currentChallenge.items.join(" ")}`,
-            "error"
-        );
-
-        showRetryButton();
-    }
-}
-
-
-/* =========================================================
-   ATTENTION GAME
-========================================================= */
-
-function startAttentionLevel(level) {
-
-    clearChallengeTimer();
-
-    const challenge =
-        createAttentionChallenge(level);
-
-    currentChallenge = challenge;
-
-    $("gameInstruction").textContent =
-        challenge.instruction;
-
-    $("challengeArea").innerHTML = `
-        <div class="attention-grid">
-
-            ${challenge.options.map(
-                (item, index) => `
-                    <button
-                        type="button"
-                        class="attention-option"
-                        data-index="${index}">
-                        ${escapeHTML(item)}
-                    </button>
-                `
-            ).join("")}
-
-        </div>
-    `;
-
-    $("answerArea").innerHTML = "";
-
-    document
-        .querySelectorAll(".attention-option")
-        .forEach(button => {
+        if (isUnlocked) {
 
             button.addEventListener(
                 "click",
                 () => {
 
-                    const index =
-                        Number(
-                            button.dataset.index
-                        );
-
-                    checkAttentionAnswer(index);
+                    startGame(level);
                 }
             );
-        });
+        }
+
+
+        levelsGrid.appendChild(button);
+    }
 }
 
 
-/* =========================================================
-   ATTENTION CHALLENGE GENERATOR
-========================================================= */
+/* =========================================
+   START GAME
+========================================= */
 
-function createAttentionChallenge(level) {
+function startGame(level) {
 
-    let size;
+    currentLevel = level;
 
-    if (level <= 5) {
+    currentScore = 0;
 
-        size = 4;
+    currentLevelDisplay.textContent =
+        level;
 
-    } else if (level <= 14) {
+    currentScoreDisplay.textContent =
+        "0";
 
-        size = 6;
+    gameType.textContent =
+        currentTest;
 
-    } else if (level <= 20) {
 
-        size = 8;
+    levelScreen.classList.add("hidden");
 
-    } else if (level <= 30) {
+    gameScreen.classList.remove("hidden");
 
-        size = 9;
+    gameResult.classList.add("hidden");
 
-    } else if (level <= 40) {
 
-        size = 12;
+    if (currentTest === "memory") {
+
+        memoryGame.classList.remove("hidden");
+
+        attentionGame.classList.add("hidden");
+
+        startMemoryGame();
 
     } else {
 
-        size = 16;
+        memoryGame.classList.add("hidden");
+
+        attentionGame.classList.remove("hidden");
+
+        startAttentionGame();
+    }
+}
+
+
+/* =========================================
+   MEMORY GAME
+========================================= */
+
+function startMemoryGame() {
+
+    stopMemoryTimer();
+
+    memoryInputArea.classList.add("hidden");
+
+    memoryAnswerInput.value = "";
+
+    memorySequence.textContent =
+        "Get Ready...";
+
+
+    const sequenceLength =
+        Math.min(
+            3 + Math.floor(
+                (currentLevel - 1) / 5
+            ),
+            10
+        );
+
+
+    const characters =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+
+    memoryAnswer =
+        "";
+
+    for (
+        let i = 0;
+        i < sequenceLength;
+        i++
+    ) {
+
+        memoryAnswer +=
+            characters[
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            ];
     }
 
-    /*
-       Different attention pattern from Memory.
 
-       Memory:
-       remember sequence.
+    const displayTime =
+        Math.max(
+            1400,
+            3000 -
+            currentLevel * 25
+        );
 
-       Attention:
-       identify the single different
-       symbol / word / number.
-    */
 
-    const basePool = [
+    memorySequence.textContent =
+        memoryAnswer;
+
+
+    memoryTimer =
+        setTimeout(
+            () => {
+
+                memorySequence.textContent =
+                    "???";
+
+                memoryInputArea.classList.remove(
+                    "hidden"
+                );
+
+                memoryAnswerInput.focus();
+
+            },
+            displayTime
+        );
+}
+
+
+/* =========================================
+   MEMORY SUBMIT
+========================================= */
+
+memorySubmit.addEventListener(
+    "click",
+    checkMemoryAnswer
+);
+
+
+memoryAnswerInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+
+            checkMemoryAnswer();
+        }
+    }
+);
+
+
+function checkMemoryAnswer() {
+
+    const answer =
+        memoryAnswerInput
+            .value
+            .trim()
+            .toUpperCase();
+
+
+    if (!answer) {
+
+        return;
+    }
+
+
+    if (answer === memoryAnswer) {
+
+        const baseScore = 100;
+
+        currentScore =
+            baseScore +
+            currentLevel * 5;
+
+        finishGame(
+            true,
+            currentScore
+        );
+
+    } else {
+
+        currentScore =
+            Math.max(
+                20,
+                100 -
+                currentLevel * 2
+            );
+
+        finishGame(
+            false,
+            currentScore
+        );
+    }
+}
+
+
+/* =========================================
+   ATTENTION GAME
+========================================= */
+
+function startAttentionGame() {
+
+    attentionGrid.innerHTML = "";
+
+    const totalItems =
+        Math.min(
+            9 +
+            Math.floor(
+                currentLevel / 5
+            ),
+            20
+        );
+
+
+    const symbols = [
         "●",
-        "▲",
         "■",
         "◆",
         "★",
-        "+",
-        "=",
-        "%",
-        "#",
-        "@"
+        "▲"
     ];
 
-    const wordPool = [
-        "FOCUS",
-        "TRAIN",
-        "BRAIN",
-        "LIGHT",
-        "RIVER",
-        "STONE",
-        "MIND",
-        "SMART"
-    ];
 
-    const numberPool = [
-        "11",
-        "22",
-        "33",
-        "44",
-        "55",
-        "66",
-        "77",
-        "88",
-        "99"
-    ];
-
-    let pool;
-
-    if (level <= 10) {
-
-        pool = basePool;
-
-    } else if (level <= 20) {
-
-        pool = [
-            ...basePool,
-            ...wordPool
+    const normalSymbol =
+        symbols[
+            Math.floor(
+                Math.random() *
+                symbols.length
+            )
         ];
 
-    } else {
 
-        pool = [
-            ...basePool,
-            ...wordPool,
-            ...numberPool
-        ];
-    }
-
-    const base =
-        randomItem(pool);
-
-    let different;
-
-    do {
-
-        different =
-            randomItem(pool);
-
-    } while (different === base);
-
-    const options =
-        Array(size).fill(base);
-
-    const oddIndex =
-        Math.floor(
-            Math.random() * size
-        );
-
-    options[oddIndex] =
-        different;
-
-    shuffle(options);
-
-    const finalIndex =
-        options.indexOf(different);
-
-    return {
-        options,
-        correctIndex: finalIndex,
-
-        instruction:
-            level <= 10
-                ? "Find the different symbol."
-                : level <= 20
-                    ? "Find the different item."
-                    : "Stay focused. Find the one item that is different."
-    };
-}
+    let differentSymbol =
+        normalSymbol;
 
 
-/* =========================================================
-   ATTENTION ANSWER
-========================================================= */
-
-function checkAttentionAnswer(index) {
-
-    if (!currentChallenge) return;
-
-    if (
-        index ===
-        currentChallenge.correctIndex
+    while (
+        differentSymbol === normalSymbol
     ) {
 
-        finishLevel(
-            100 + currentLevel * 6
+        differentSymbol =
+            symbols[
+                Math.floor(
+                    Math.random() *
+                    symbols.length
+                )
+            ];
+    }
+
+
+    const differentIndex =
+        Math.floor(
+            Math.random() *
+            totalItems
         );
 
-    } else {
 
-        showGameMessage(
-            "Good try. Look carefully and try again.",
-            "error"
+    for (
+        let i = 0;
+        i < totalItems;
+        i++
+    ) {
+
+        const item =
+            document.createElement("button");
+
+        item.type = "button";
+
+        item.className =
+            "attention-item";
+
+        item.textContent =
+            i === differentIndex
+                ? differentSymbol
+                : normalSymbol;
+
+
+        item.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    i === differentIndex
+                ) {
+
+                    currentScore =
+                        100 +
+                        currentLevel * 5;
+
+                    finishGame(
+                        true,
+                        currentScore
+                    );
+
+                } else {
+
+                    currentScore =
+                        25;
+
+                    finishGame(
+                        false,
+                        currentScore
+                    );
+                }
+            }
         );
 
-        showRetryButton();
+
+        attentionGrid.appendChild(item);
     }
 }
 
 
-/* =========================================================
-   FINISH LEVEL
-========================================================= */
+/* =========================================
+   FINISH GAME
+========================================= */
 
-async function finishLevel(score) {
+async function finishGame(
+    success,
+    score
+) {
 
-    clearChallengeTimer();
+    stopMemoryTimer();
 
     currentScore = score;
 
-    $("gameScore").textContent =
+    currentScoreDisplay.textContent =
         score;
 
-    showGameMessage(
-        `Excellent! Level ${currentLevel} completed.`,
-        "success"
-    );
+    memoryGame.classList.add("hidden");
 
-    disableGameInputs();
+    attentionGame.classList.add("hidden");
 
-    $("nextLevelButton").classList.remove(
-        "hidden"
-    );
+    gameResult.classList.remove("hidden");
+
+    resultScore.textContent =
+        score;
+
+
+    if (success) {
+
+        document.getElementById(
+            "resultTitle"
+        ).textContent =
+            "Level Complete! 🎉";
+
+        resultMessage.textContent =
+            "Excellent work. The next level is now unlocked.";
+
+    } else {
+
+        document.getElementById(
+            "resultTitle"
+        ).textContent =
+            "Good Attempt! 💪";
+
+        resultMessage.textContent =
+            "Your score has been recorded. Keep training!";
+    }
+
 
     await saveProgress(
         currentTest,
         currentLevel,
         score
     );
+
+
+    await loadDashboardProgress();
+
+
+    nextLevelButton.textContent =
+        currentLevel < TOTAL_LEVELS
+            ? "Continue →"
+            : "Back to Levels";
 }
 
 
-/* =========================================================
+/* =========================================
    SAVE PROGRESS
-========================================================= */
+========================================= */
 
 async function saveProgress(
     test,
@@ -1283,13 +1173,15 @@ async function saveProgress(
     score
 ) {
 
-    if (!currentUser) return;
+    if (!currentUser) {
+        return;
+    }
 
     try {
 
         const response =
             await fetch(
-                `${API}/api/progress`,
+                `${API_URL}/api/progress`,
                 {
                     method: "POST",
 
@@ -1299,307 +1191,151 @@ async function saveProgress(
                     },
 
                     body: JSON.stringify({
+
                         user_id:
                             currentUser.id,
 
-                        test,
+                        test:
+                            test,
 
-                        level,
+                        level:
+                            level,
 
-                        score
+                        score:
+                            score
                     })
                 }
             );
 
+
         if (!response.ok) {
 
-            throw new Error(
-                "Could not save progress"
+            console.error(
+                "Progress could not be saved."
             );
         }
 
-        /*
-           Update local progress immediately.
-        */
+    } catch (error) {
 
-        const target =
-            test === "memory"
-                ? memoryProgress
-                : attentionProgress;
+        console.error(
+            "Save progress error:",
+            error
+        );
+    }
+}
 
-        const existing =
-            target.find(
-                item =>
-                    Number(item.level) === level
+
+/* =========================================
+   NEXT LEVEL
+========================================= */
+
+nextLevelButton.addEventListener(
+    "click",
+    () => {
+
+        gameResult.classList.add("hidden");
+
+        if (
+            currentLevel < TOTAL_LEVELS
+        ) {
+
+            startGame(
+                currentLevel + 1
             );
-
-        if (existing) {
-
-            existing.score =
-                Math.max(
-                    Number(existing.score) || 0,
-                    score
-                );
 
         } else {
 
-            target.push({
-                level,
-                score
-            });
+            gameScreen.classList.add("hidden");
+
+            levelScreen.classList.remove("hidden");
+
+            renderLevels();
+        }
+    }
+);
+
+
+/* =========================================
+   STOP TIMER
+========================================= */
+
+function stopMemoryTimer() {
+
+    if (memoryTimer) {
+
+        clearTimeout(memoryTimer);
+
+        memoryTimer = null;
+    }
+}
+
+
+/* =========================================
+   RESTORE SESSION
+========================================= */
+
+function restoreSession() {
+
+    const savedUser =
+        localStorage.getItem(
+            "brainlytixUser"
+        );
+
+
+    if (!savedUser) {
+
+        authScreen.classList.remove(
+            "hidden"
+        );
+
+        mainScreen.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        currentUser =
+            JSON.parse(savedUser);
+
+
+        if (
+            !currentUser.id ||
+            !currentUser.username
+        ) {
+
+            throw new Error(
+                "Invalid session"
+            );
         }
 
-        updateHomeStats();
+
+        showMainScreen();
 
     } catch (error) {
 
         console.error(error);
 
-        showToast(
-            "Level completed, but progress could not be saved."
+        localStorage.removeItem(
+            "brainlytixUser"
+        );
+
+        authScreen.classList.remove(
+            "hidden"
+        );
+
+        mainScreen.classList.add(
+            "hidden"
         );
     }
 }
 
 
-/* =========================================================
-   NEXT LEVEL
-========================================================= */
-
-$("nextLevelButton").addEventListener(
-    "click",
-    () => {
-
-        const next =
-            currentLevel + 1;
-
-        if (next <= 50) {
-
-            startLevel(next);
-
-        } else {
-
-            showToast(
-                "You completed all 50 levels!"
-            );
-
-            openLevels(currentTest);
-        }
-    }
-);
-
-
-/* =========================================================
-   RETRY
-========================================================= */
-
-function showRetryButton() {
-
-    const button =
-        document.createElement("button");
-
-    button.type = "button";
-
-    button.className =
-        "primary-btn next-button";
-
-    button.textContent =
-        "Try This Level Again";
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            startLevel(currentLevel);
-        }
-    );
-
-    $("answerArea").appendChild(button);
-}
-
-
-/* =========================================================
-   DISABLE INPUTS
-========================================================= */
-
-function disableGameInputs() {
-
-    document
-        .querySelectorAll(
-            ".attention-option, .submit-answer"
-        )
-        .forEach(button => {
-
-            button.disabled = true;
-        });
-
-    const input =
-        $("memoryAnswer");
-
-    if (input) {
-        input.disabled = true;
-    }
-}
-
-
-/* =========================================================
-   BACK BUTTONS
-========================================================= */
-
-$("gameBackButton").addEventListener(
-    "click",
-    () => {
-
-        clearChallengeTimer();
-
-        openLevels(currentTest);
-    }
-);
-
-
-/* =========================================================
-   GAME MESSAGE
-========================================================= */
-
-function showGameMessage(
-    message,
-    type = ""
-) {
-
-    $("gameMessage").textContent =
-        message;
-
-    $("gameMessage").className =
-        `game-message ${type}`;
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-let toastTimer = null;
-
-function showToast(message) {
-
-    const toast =
-        $("toast");
-
-    toast.textContent =
-        message;
-
-    toast.classList.add("show");
-
-    clearTimeout(toastTimer);
-
-    toastTimer =
-        setTimeout(() => {
-
-            toast.classList.remove("show");
-
-        }, 2500);
-}
-
-
-/* =========================================================
-   RANDOM HELPERS
-========================================================= */
-
-function randomItem(array) {
-
-    return array[
-        Math.floor(
-            Math.random() * array.length
-        )
-    ];
-}
-
-
-function randomChar(string) {
-
-    return string[
-        Math.floor(
-            Math.random() * string.length
-        )
-    ];
-}
-
-
-function shuffle(array) {
-
-    for (
-        let i = array.length - 1;
-        i > 0;
-        i--
-    ) {
-
-        const j =
-            Math.floor(
-                Math.random() * (i + 1)
-            );
-
-        [
-            array[i],
-            array[j]
-        ] = [
-            array[j],
-            array[i]
-        ];
-    }
-
-    return array;
-}
-
-
-function normalizeAnswer(value) {
-
-    return value
-        .trim()
-        .replace(/\s+/g, " ")
-        .toUpperCase();
-}
-
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-
-/* =========================================================
-   TIMER
-========================================================= */
-
-function clearChallengeTimer() {
-
-    if (challengeTimer) {
-
-        clearTimeout(
-            challengeTimer
-        );
-
-        challengeTimer = null;
-    }
-}
-
-
-/* =========================================================
-   START
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        setAuthMode("login");
-
-        showScreen("authScreen");
-
-        restoreSession();
-    }
-);
+/* =========================================
+   START APPLICATION
+========================================= */
+
+restoreSession();

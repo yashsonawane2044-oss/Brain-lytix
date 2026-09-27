@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Brainlytix | Cognitive Training</title>
 
@@ -12,432 +15,720 @@
 <body>
 
     <!-- =========================
-         AUTH SCREEN
+         APP
     ========================== -->
 
-    <section id="authScreen" class="screen">
+    <div id="app">
 
-        <div class="auth-card">
+        <!-- =========================
+             AUTH SCREEN
+        ========================== -->
 
-            <div class="brand-mark">🧠</div>
+        <section id="authScreen" class="auth-screen">
 
-            <h1>Brainlytix</h1>
+            <div class="auth-background"></div>
 
-            <p class="auth-subtitle">
-                Train your memory. Sharpen your attention.
-            </p>
+            <div class="auth-container">
 
-            <div class="auth-tabs">
+                <!-- BRAND -->
+                <div class="brand auth-brand">
+                    <div class="brand-icon">🧠</div>
 
-                <button
-                    id="loginTab"
-                    class="auth-tab active"
-                    type="button">
-                    Login
-                </button>
-
-                <button
-                    id="registerTab"
-                    class="auth-tab"
-                    type="button">
-                    Register
-                </button>
-
-            </div>
-
-            <form id="authForm">
-
-                <label for="username">Username</label>
-
-                <input
-                    id="username"
-                    type="text"
-                    placeholder="Enter username"
-                    autocomplete="username"
-                    required
-                >
-
-                <label for="password">Password</label>
-
-                <input
-                    id="password"
-                    type="password"
-                    placeholder="Enter password"
-                    autocomplete="current-password"
-                    required
-                >
-
-                <button
-                    id="authButton"
-                    class="primary-btn"
-                    type="submit">
-                    Login
-                </button>
-
-            </form>
-
-            <div id="authMessage" class="message"></div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         HOME SCREEN
-    ========================== -->
-
-    <section id="menuScreen" class="screen hidden">
-
-        <header class="topbar">
-
-            <div class="brand-area">
-
-                <div class="mini-logo">🧠</div>
-
-                <div>
-                    <strong>Brainlytix</strong>
-                    <span>Memory & Attention Training</span>
+                    <div>
+                        <h1>Brainlytix</h1>
+                        <p>Memory & Attention Training</p>
+                    </div>
                 </div>
 
-            </div>
 
-            <div class="user-area">
+                <!-- AUTH CARD -->
+                <div class="auth-card">
 
-                <div class="user-pill">
-                    <span>Hi,</span>
-                    <strong id="welcomeUser">Player</strong>
+                    <div class="auth-header">
+
+                        <div class="auth-icon">
+                            🧠
+                        </div>
+
+                        <h2 id="authTitle">
+                            Welcome back
+                        </h2>
+
+                        <p id="authSubtitle">
+                            Login to continue your brain training journey.
+                        </p>
+
+                    </div>
+
+
+                    <!-- LOGIN FORM -->
+
+                    <form id="loginForm">
+
+                        <div class="input-group">
+
+                            <label for="loginUsername">
+                                Username
+                            </label>
+
+                            <input
+                                id="loginUsername"
+                                type="text"
+                                placeholder="Enter your username"
+                                autocomplete="username"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label for="loginPassword">
+                                Password
+                            </label>
+
+                            <input
+                                id="loginPassword"
+                                type="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                            id="loginButton"
+                        >
+                            <span>Login</span>
+                            <span>→</span>
+                        </button>
+
+                    </form>
+
+
+                    <!-- REGISTER FORM -->
+
+                    <form
+                        id="registerForm"
+                        class="hidden"
+                    >
+
+                        <div class="input-group">
+
+                            <label for="registerUsername">
+                                Username
+                            </label>
+
+                            <input
+                                id="registerUsername"
+                                type="text"
+                                placeholder="Create a username"
+                                autocomplete="username"
+                                minlength="3"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label for="registerPassword">
+                                Password
+                            </label>
+
+                            <input
+                                id="registerPassword"
+                                type="password"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                minlength="6"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            <span>Create Account</span>
+                            <span>→</span>
+                        </button>
+
+                    </form>
+
+
+                    <!-- MESSAGE -->
+
+                    <div
+                        id="authMessage"
+                        class="auth-message"
+                    ></div>
+
+
+                    <!-- SWITCH -->
+
+                    <div class="auth-switch">
+
+                        <span id="switchText">
+                            Don't have an account?
+                        </span>
+
+                        <button
+                            id="switchAuth"
+                            type="button"
+                        >
+                            Register
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <button
-                    id="logoutButton"
-                    class="secondary-btn"
-                    type="button">
-                    Logout
-                </button>
 
-            </div>
-
-        </header>
-
-
-        <main class="home-container">
-
-            <section class="hero">
-
-                <div class="hero-badge">
-                    <span>✦</span>
-                    COGNITIVE TRAINING
-                </div>
-
-                <h1>
-                    Train Your
-                    <span>Brain</span>
-                </h1>
-
-                <p>
-                    Short, progressive challenges designed to make
-                    memory and attention training enjoyable.
+                <p class="auth-footer">
+                    Train consistently. Improve progressively.
                 </p>
 
-            </section>
+            </div>
+
+        </section>
 
 
-            <section class="test-grid">
+        <!-- =========================
+             MAIN APP
+        ========================== -->
 
-                <button
-                    id="memoryCard"
-                    class="test-card memory-card"
-                    type="button">
+        <section
+            id="mainScreen"
+            class="main-screen hidden"
+        >
 
-                    <div class="floating-shape shape-one"></div>
+            <!-- NAVBAR -->
 
-                    <div class="test-icon">🧠</div>
+            <header class="navbar">
 
-                    <div class="test-content">
+                <div class="brand">
 
-                        <div class="card-label">
-                            MEMORY
+                    <div class="brand-icon">
+                        🧠
+                    </div>
+
+                    <div>
+                        <h1>Brainlytix</h1>
+                        <span>
+                            Cognitive Training
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="nav-right">
+
+                    <div class="user-badge">
+
+                        <div class="avatar">
+                            <span id="avatarLetter">U</span>
                         </div>
 
-                        <h2>Memory Test</h2>
+                        <div>
+                            <strong id="usernameDisplay">
+                                User
+                            </strong>
+
+                            <small>
+                                Trainee
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        id="logoutButton"
+                        class="logout-button"
+                        type="button"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <!-- MAIN CONTENT -->
+
+            <main class="dashboard-container">
+
+                <!-- HERO -->
+
+                <section class="hero">
+
+                    <div>
+
+                        <span class="eyebrow">
+                            🧠 COGNITIVE TRAINING
+                        </span>
+
+                        <h2>
+                            Train Your
+                            <span>Brain</span>
+                        </h2>
 
                         <p>
-                            Remember letters, numbers, words and
-                            arithmetic patterns.
+                            Short, progressive challenges designed
+                            to strengthen your memory and attention.
                         </p>
 
-                        <div class="card-footer">
-                            <span>50 Levels</span>
-                            <span class="arrow">→</span>
+                    </div>
+
+                    <div class="hero-brain">
+                        🧠
+                    </div>
+
+                </section>
+
+
+                <!-- STATS -->
+
+                <section class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon purple">
+                            🧠
+                        </div>
+
+                        <div>
+                            <strong id="memoryStat">
+                                0 / 50
+                            </strong>
+
+                            <span>
+                                Memory Progress
+                            </span>
                         </div>
 
                     </div>
 
-                </button>
 
+                    <div class="stat-card">
 
-                <button
-                    id="attentionCard"
-                    class="test-card attention-card"
-                    type="button">
-
-                    <div class="floating-shape shape-two"></div>
-
-                    <div class="test-icon">🎯</div>
-
-                    <div class="test-content">
-
-                        <div class="card-label">
-                            ATTENTION
+                        <div class="stat-icon blue">
+                            🎯
                         </div>
 
-                        <h2>Attention Test</h2>
+                        <div>
+                            <strong id="attentionStat">
+                                0 / 50
+                            </strong>
 
-                        <p>
-                            Find differences, detect patterns and
-                            improve your focus.
-                        </p>
-
-                        <div class="card-footer">
-                            <span>50 Levels</span>
-                            <span class="arrow">→</span>
+                            <span>
+                                Attention Progress
+                            </span>
                         </div>
 
                     </div>
 
-                </button>
 
-            </section>
+                    <div class="stat-card">
 
+                        <div class="stat-icon yellow">
+                            🏆
+                        </div>
 
-            <section class="stats-section">
+                        <div>
+                            <strong id="completedStat">
+                                0
+                            </strong>
 
-                <div class="stat-card">
+                            <span>
+                                Completed Levels
+                            </span>
+                        </div>
 
-                    <span class="stat-icon">🧠</span>
-
-                    <div>
-                        <strong id="memoryProgress">1 / 50</strong>
-                        <span>Memory Progress</span>
                     </div>
 
-                </div>
+                </section>
 
 
-                <div class="stat-card">
+                <!-- TEST CARDS -->
 
-                    <span class="stat-icon">🎯</span>
+                <section class="tests-section">
 
-                    <div>
-                        <strong id="attentionProgress">1 / 50</strong>
-                        <span>Attention Progress</span>
+                    <div class="section-heading">
+
+                        <div>
+                            <span>
+                                TRAINING MODES
+                            </span>
+
+                            <h3>
+                                Choose Your Challenge
+                            </h3>
+                        </div>
+
                     </div>
 
-                </div>
+
+                    <div class="test-grid">
+
+                        <!-- MEMORY -->
+
+                        <article class="test-card memory-card">
+
+                            <div class="test-top">
+
+                                <div class="large-test-icon">
+                                    🧠
+                                </div>
+
+                                <span class="level-pill">
+                                    50 Levels
+                                </span>
+
+                            </div>
 
 
-                <div class="stat-card">
+                            <div class="test-content">
 
-                    <span class="stat-icon">🏆</span>
+                                <small>
+                                    MEMORY
+                                </small>
 
-                    <div>
-                        <strong id="totalCompleted">0</strong>
-                        <span>Completed Levels</span>
+                                <h4>
+                                    Memory Test
+                                </h4>
+
+                                <p>
+                                    Remember letters, numbers,
+                                    words and arithmetic patterns.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                id="memoryButton"
+                                class="test-button"
+                                type="button"
+                            >
+                                Start Memory
+                                <span>→</span>
+                            </button>
+
+                        </article>
+
+
+                        <!-- ATTENTION -->
+
+                        <article class="test-card attention-card">
+
+                            <div class="test-top">
+
+                                <div class="large-test-icon">
+                                    🎯
+                                </div>
+
+                                <span class="level-pill">
+                                    50 Levels
+                                </span>
+
+                            </div>
+
+
+                            <div class="test-content">
+
+                                <small>
+                                    ATTENTION
+                                </small>
+
+                                <h4>
+                                    Attention Test
+                                </h4>
+
+                                <p>
+                                    Find differences, detect
+                                    patterns and improve your focus.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                id="attentionButton"
+                                class="test-button"
+                                type="button"
+                            >
+                                Start Attention
+                                <span>→</span>
+                            </button>
+
+                        </article>
+
                     </div>
 
-                </div>
-
-            </section>
-
-        </main>
-
-    </section>
+                </section>
 
 
-    <!-- =========================
-         LEVEL SCREEN
-    ========================== -->
+                <!-- LEVEL SCREEN -->
 
-    <section id="levelsScreen" class="screen hidden">
+                <section
+                    id="levelScreen"
+                    class="levels-section hidden"
+                >
 
-        <header class="topbar">
+                    <div class="level-header">
 
-            <button
-                id="levelsBackButton"
-                class="secondary-btn"
-                type="button">
-                ← Home
-            </button>
+                        <button
+                            id="backToDashboard"
+                            class="back-button"
+                            type="button"
+                        >
+                            ← Back
+                        </button>
 
-            <div class="level-header-title">
+                        <div>
 
-                <span id="levelTestIcon">🧠</span>
+                            <span
+                                id="levelTypeLabel"
+                                class="eyebrow"
+                            >
+                                MEMORY
+                            </span>
 
-                <div>
-                    <strong id="levelTitle">Memory Levels</strong>
-                    <span id="levelSubtitle">
-                        Complete each level to unlock the next.
-                    </span>
-                </div>
+                            <h3 id="levelTitle">
+                                Memory Levels
+                            </h3>
 
-            </div>
+                            <p>
+                                Complete levels to unlock the next challenge.
+                            </p>
 
-            <div class="level-count">
-                <span id="completedCount">0</span>/50
-            </div>
+                        </div>
 
-        </header>
-
-
-        <main class="levels-container">
-
-            <div class="levels-intro">
-
-                <div>
-                    <div class="section-label">YOUR JOURNEY</div>
-
-                    <h1 id="levelsHeading">
-                        Choose a level
-                    </h1>
-
-                    <p id="levelsDescription">
-                        Complete levels in order and build your skills.
-                    </p>
-                </div>
-
-                <div class="difficulty-legend">
-
-                    <span>
-                        <i class="easy-dot"></i>
-                        Easy
-                    </span>
-
-                    <span>
-                        <i class="medium-dot"></i>
-                        Intermediate
-                    </span>
-
-                    <span>
-                        <i class="hard-dot"></i>
-                        Hard
-                    </span>
-
-                    <span>
-                        <i class="expert-dot"></i>
-                        Expert
-                    </span>
-
-                </div>
-
-            </div>
+                    </div>
 
 
-            <div id="levelsGrid" class="levels-grid"></div>
-
-        </main>
-
-    </section>
-
-
-    <!-- =========================
-         GAME SCREEN
-    ========================== -->
-
-    <section id="gameScreen" class="screen hidden">
-
-        <header class="topbar">
-
-            <button
-                id="gameBackButton"
-                class="secondary-btn"
-                type="button">
-                ← Levels
-            </button>
-
-            <div class="game-title">
-
-                <span id="gameIcon">🧠</span>
-
-                <div>
-                    <strong id="gameTestName">Memory Test</strong>
-                    <span id="gameLevelName">Level 1</span>
-                </div>
-
-            </div>
-
-            <div class="score-pill">
-                Score <strong id="gameScore">0</strong>
-            </div>
-
-        </header>
-
-
-        <main class="game-container">
-
-            <div class="game-progress">
-
-                <div>
-                    <span>Level Progress</span>
-                    <strong id="progressText">1 / 50</strong>
-                </div>
-
-                <div class="progress-track">
                     <div
-                        id="progressFill"
-                        class="progress-fill">
+                        id="levelsGrid"
+                        class="levels-grid"
+                    ></div>
+
+                </section>
+
+
+                <!-- GAME SCREEN -->
+
+                <section
+                    id="gameScreen"
+                    class="game-section hidden"
+                >
+
+                    <div class="game-header">
+
+                        <button
+                            id="backToLevels"
+                            class="back-button"
+                            type="button"
+                        >
+                            ← Levels
+                        </button>
+
+                        <div class="game-progress-info">
+
+                            <span id="gameType">
+                                Memory
+                            </span>
+
+                            <strong>
+                                Level
+                                <span id="currentLevel">
+                                    1
+                                </span>
+                            </strong>
+
+                        </div>
+
+                        <div class="score-display">
+                            Score:
+                            <strong id="currentScore">
+                                0
+                            </strong>
+                        </div>
+
                     </div>
-                </div>
-
-            </div>
 
 
-            <div class="game-card">
+                    <!-- GAME CONTENT -->
 
-                <div
-                    id="gameInstruction"
-                    class="game-instruction">
-                    Get ready.
-                </div>
+                    <div class="game-card">
 
+                        <!-- MEMORY GAME -->
 
-                <div
-                    id="challengeArea"
-                    class="challenge-area">
-                </div>
+                        <div
+                            id="memoryGame"
+                            class="game-content hidden"
+                        >
 
+                            <div class="game-instruction">
 
-                <div
-                    id="answerArea"
-                    class="answer-area">
-                </div>
+                                <span>
+                                    🧠
+                                </span>
 
+                                <h3>
+                                    Remember the sequence
+                                </h3>
 
-                <div
-                    id="gameMessage"
-                    class="game-message">
-                </div>
+                                <p>
+                                    Watch carefully. The sequence
+                                    will disappear. Then enter it.
+                                </p>
 
-
-                <button
-                    id="nextLevelButton"
-                    class="primary-btn next-button hidden"
-                    type="button">
-                    Continue →
-                </button>
-
-            </div>
-
-        </main>
-
-    </section>
+                            </div>
 
 
-    <!-- =========================
-         TOAST
-    ========================== -->
+                            <div
+                                id="memorySequence"
+                                class="sequence-box"
+                            >
+                                Get Ready...
+                            </div>
 
-    <div id="toast" class="toast"></div>
+
+                            <div
+                                id="memoryInputArea"
+                                class="answer-area hidden"
+                            >
+
+                                <input
+                                    id="memoryAnswer"
+                                    type="text"
+                                    placeholder="Enter the sequence"
+                                    autocomplete="off"
+                                >
+
+                                <button
+                                    id="memorySubmit"
+                                    class="primary-button"
+                                    type="button"
+                                >
+                                    Submit Answer
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ATTENTION GAME -->
+
+                        <div
+                            id="attentionGame"
+                            class="game-content hidden"
+                        >
+
+                            <div class="game-instruction">
+
+                                <span>
+                                    🎯
+                                </span>
+
+                                <h3>
+                                    Find the different symbol
+                                </h3>
+
+                                <p>
+                                    Select the symbol that is different
+                                    from the others.
+                                </p>
+
+                            </div>
+
+
+                            <div
+                                id="attentionGrid"
+                                class="attention-grid"
+                            ></div>
+
+                        </div>
+
+
+                        <!-- RESULT -->
+
+                        <div
+                            id="gameResult"
+                            class="game-result hidden"
+                        >
+
+                            <div class="result-icon">
+                                🎉
+                            </div>
+
+                            <h3 id="resultTitle">
+                                Level Complete!
+                            </h3>
+
+                            <p id="resultMessage">
+                                Great work.
+                            </p>
+
+                            <div class="result-score">
+
+                                <span>
+                                    Your Score
+                                </span>
+
+                                <strong id="resultScore">
+                                    0
+                                </strong>
+
+                            </div>
+
+                            <button
+                                id="nextLevelButton"
+                                class="primary-button"
+                                type="button"
+                            >
+                                Continue →
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </main>
+
+
+            <!-- FOOTER -->
+
+            <footer class="footer">
+
+                <span>
+                    © 2026 Brainlytix
+                </span>
+
+                <span>
+                    Train • Focus • Improve
+                </span>
+
+            </footer>
+
+        </section>
+
+    </div>
 
 
     <script src="script.js"></script>
